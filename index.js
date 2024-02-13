@@ -7,7 +7,13 @@ const PORT = process.env.PORT || 3000;
 
 
 mongoose.connect('mongodb+srv://mayurpanchal527:Madara%402002@cluster0.zejgeu7.mongodb.net/ecommerce'
-, { useNewUrlParser: true, useUnifiedTopology: true });
+, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
+  if (err) {
+      console.error('Error connecting to MongoDB:', err);
+  } else {
+      console.log('Connected to MongoDB');
+  }
+});
 
 
 const orderSchema = new mongoose.Schema({

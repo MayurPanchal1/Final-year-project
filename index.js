@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const uuid = require('uuid');
+const axios = require('axios');
 
 
 const app = express();
@@ -55,6 +56,9 @@ const orderSchema = new mongoose.Schema({
 
 const Order = mongoose.model('Order', orderSchema);
 
+const CART_API_URL = 'https://your-friend-api.com/cart';
+const USER_API_URL = 'https://your-friend-api.com/user';
+
 
 app.use(bodyParser.json());
 
@@ -68,14 +72,52 @@ app.get('/orders', async (req, res) => {
   }
 });
 
-app.post('/orders', async (req, res) => {
+// app.post('/orders', async (req, res) => {
+//   try {
+//     const { productName, quantity } = req.body;
+//     const order = new Order({ productName, quantity });
+//     await order.save();
+//     res.status(201).json(order);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
+
+app.post('/api/orders', async (req, res) => {
   try {
-    const { productName, quantity } = req.body;
-    const order = new Order({ productName, quantity });
+    const { cartId, userId } = req.body;
+
+
+    if (!cartId || !userId) {
+      return res.status(400).json({ error: 'Cart ID and User ID are required.' });
+    }
+
+
+    const [cartResponse, userResponse] = await Promise.all([
+      axios.get(`${CART_API_URL}/${cartId}`),
+      axios.get(`${USER_API_URL}/${userId}`),
+    ]);
+
+    const cart = cartResponse.data;
+    const user = userResponse.data;
+
+
+    const order = new Order({
+      orderId: generateOrderId(),
+      user,
+      cart,
+      status: 'Pending', 
+      timestamp: new Date().toISOString(),
+    });
+
+
     await order.save();
-    res.status(201).json(order);
+
+
+    res.status(201).json({ success: true, order });
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error processing order:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

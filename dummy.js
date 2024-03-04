@@ -4,7 +4,7 @@ const axios = require('axios');
 const mongoose = require('mongoose');
 
 const app = express();
-const PORT = 3000;
+const PORT = 8084;
 
 app.use(bodyParser.json());
 

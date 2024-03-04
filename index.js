@@ -5,7 +5,7 @@ const uuid = require('uuid');
 
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8084;
 
 
 mongoose.connect('mongodb+srv://mayurpanchal527:Madara%402002@cluster0.zejgeu7.mongodb.net/ecommerce'
